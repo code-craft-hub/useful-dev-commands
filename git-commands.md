@@ -7,6 +7,15 @@ Initial Setup
 git config --global user.name "Your Name"
 git config --global user.email "your.email@example.com"
 
+### create a new branch in a specific commit
+git checkout -b practice/kafka-basics 01fb5ae
+
+### Remove untrack files and directories
+git clean -fd
+
+### Remove cache
+git remove --cached
+
 # Check configuration
 
 git config --list
