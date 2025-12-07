@@ -67,6 +67,31 @@ WHERE datname = 'referral_system'
 | `\ddp` | List default privileges | **d** = describe, **dp** = default privileges |
 | `\dE` | **D**escribe foreign tables | **E** = external tables |
 
+
+# DROP TABLE OPERATIONS
+
+### Drop only the foreign key
+
+ALTER TABLE posts DROP CONSTRAINT posts_user_id_fkey;
+
+Then drop the table:
+
+DROP TABLE users;
+
+### Drop the users table and all dependent objects
+
+This will drop users AND automatically drop the foreign key in the posts table:
+
+DROP TABLE users CASCADE;
+
+
+ALTER TABLE <table_name> DROP CONSTRAINT <constraint_name>;
+
+SELECT *
+FROM pg_catalog.pg_constraint
+WHERE confrelid = 'users'::regclass;
+
+
 ## SQL Execution & Files
 
 | Command | What It Does | Why Named This Way |
