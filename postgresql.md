@@ -2,6 +2,18 @@
 
 # Steps to clone Prod Database & data to Local Dev Database
 
+## Option 1
+
+1. Select all and save as .csv
+
+\copy job_posts FROM 'C:\Users\ADMIN\Documents\job_posts.csv' WITH (FORMAT csv, HEADER true, DELIMITER ',', ENCODING 'UTF8');
+
+2. import it back in the next table
+
+\copy job_posts FROM 'C:\Users\ADMIN\Documents\job_posts.csv' WITH (FORMAT csv, HEADER true, DELIMITER',', ENCODING 'UTF8');
+
+## Option 2
+
 1. Pull data from the prod db using: npx drizzle-kit introspect
 2. Uncomment the migration
 3. Add addition schema if you need in the schema file
@@ -20,6 +32,92 @@
    ```bash
     psql -h localhost -U postgres -d neondb -f data_only.sql
    ```
+
+# View all Schemas and Tables
+```bash
+SELECT format(
+  'DROP TABLE %I.%I CASCADE;',
+  schemaname,
+  tablename
+)
+FROM pg_tables
+WHERE schemaname = 'public'
+  AND tablename <> 'job_posts';
+```
+
+# CLEAR ALL TABLE DATA
+``` bash
+
+TRUNCATE TABLE
+  users,
+  user_profiles,
+  user_contacts,
+  user_preferences,
+  user_onboardings,
+  user_subscriptions,
+  user_analytics,
+  user_referrals,
+  user_credits,
+  bookmarked_jobs,
+  applications,
+  resumes,
+  educations,
+  work_experiences,
+  projects,
+  skills,
+  skill_categories,
+  user_skills,
+  certifications,
+  users_without_resumes
+RESTART IDENTITY
+CASCADE;
+```
+
+
+# Delete all tables in the Database
+
+```bash 
+DO $$
+DECLARE
+    r RECORD;
+BEGIN
+    FOR r IN
+        SELECT schemaname, tablename
+        FROM pg_tables
+        WHERE schemaname = 'public'
+          AND tablename <> 'job_posts'
+    LOOP
+        EXECUTE format(
+            'DROP TABLE %I.%I CASCADE;',
+            r.schemaname,
+            r.tablename
+        );
+    END LOOP;
+END $$;
+```
+
+## Drop all tables not job_posts or any special table to exclude
+
+```bash
+DO $$
+DECLARE
+  r RECORD;
+BEGIN
+  FOR r IN
+    SELECT schemaname, tablename
+    FROM pg_tables
+    WHERE schemaname = 'public'
+      AND tablename <> 'job_posts'
+  LOOP
+    EXECUTE format(
+      'DROP TABLE %I.%I CASCADE;',
+      r.schemaname,
+      r.tablename
+    );
+  END LOOP;
+END $$;
+
+```
 
 ### Restart Postgres server
 
@@ -536,3 +634,48 @@ JOIN pg_catalog.pg_auth_members am ON r.oid = am.member
 JOIN pg_catalog.pg_roles m ON am.roleid = m.oid
 ORDER BY r.rolname;
 ```
+
+
+# 🔧 Core “Must-Have” PostgreSQL Extensions
+
+## Text search & similarity
+CREATE EXTENSION IF NOT EXISTS pg_trgm;        
+CREATE EXTENSION IF NOT EXISTS unaccent;       
+
+## Full-Text Search helpers
+CREATE EXTENSION IF NOT EXISTS btree_gin;      
+CREATE EXTENSION IF NOT EXISTS btree_gist;     
+
+## UUIDs
+CREATE EXTENSION IF NOT EXISTS uuid-ossp;      
+CREATE EXTENSION IF NOT EXISTS pgcrypto;       
+
+## Indexing & performance
+CREATE EXTENSION IF NOT EXISTS bloom;          
+CREATE EXTENSION IF NOT EXISTS intarray;       
+
+## Query stats & observability
+CREATE EXTENSION IF NOT EXISTS pg_stat_statements;
+
+## Data types & utilities
+CREATE EXTENSION IF NOT EXISTS citext;       
+CREATE EXTENSION IF NOT EXISTS hstore;       
+CREATE EXTENSION IF NOT EXISTS tablefunc;    
+
+
+# Command to create extension once
+DO $$
+BEGIN
+  CREATE EXTENSION IF NOT EXISTS pg_trgm;
+  CREATE EXTENSION IF NOT EXISTS unaccent;
+  CREATE EXTENSION IF NOT EXISTS btree_gin;
+  CREATE EXTENSION IF NOT EXISTS btree_gist;
+  CREATE EXTENSION IF NOT EXISTS uuid-ossp;
+  CREATE EXTENSION IF NOT EXISTS pgcrypto;
+  CREATE EXTENSION IF NOT EXISTS bloom;
+  CREATE EXTENSION IF NOT EXISTS intarray;
+  CREATE EXTENSION IF NOT EXISTS citext;
+  CREATE EXTENSION IF NOT EXISTS hstore;
+  CREATE EXTENSION IF NOT EXISTS tablefunc;
+  CREATE EXTENSION IF NOT EXISTS pg_stat_statements;
+END$$;

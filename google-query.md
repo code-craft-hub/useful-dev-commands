@@ -1,0 +1,1 @@
+(site:linkedin.com/in OR site:linkedin.com/pub) ("United States" OR "USA" OR "United States of America") ("recruiter" OR "technical recruiter" OR "talent acquisition" OR "sourcer" OR "hiring manager") intitle:"aws" "software engineer" "software engineer" -intitle:"profiles" -inurl:"dir/+"

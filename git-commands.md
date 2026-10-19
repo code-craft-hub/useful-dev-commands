@@ -8,12 +8,15 @@ git config --global user.name "Your Name"
 git config --global user.email "your.email@example.com"
 
 ### create a new branch in a specific commit
+
 git checkout -b practice/kafka-basics 01fb5ae
 
 ### Remove untrack files and directories
+
 git clean -fd
 
 ### Remove cache
+
 git remove --cached
 
 # Check configuration
@@ -81,10 +84,19 @@ git branch -m <new-name> # Rename current branch
 
 # Delete branch
 
-git branch -d <branch-name> # Safe delete
-git branch -D <branch-name> # Force delete
-git push origin --delete <branch-name> # Delete remote branch
-Remote Repository Operations
+### Safe delete
+
+git branch -d branch-name
+
+### Force delete
+
+git branch -D branch-name
+
+### Delete remote branch
+
+git push origin --delete branch-name
+
+# Remote Repository Operations
 
 ### View remotes
 
